@@ -155,6 +155,6 @@ namespace 'deploy', ->
             file = roco.application
         else
             file = "#{roco.application}-#{roco.env}"
-        
+
         run "sudo echo '#{ups}' > /tmp/upstart.tmp && sudo mv /tmp/upstart.tmp /etc/init/#{file}.conf", done
 

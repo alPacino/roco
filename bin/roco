@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 var optimist = require('optimist');
 var argv = optimist
-    .usage('Usage: roco [-tT] [env] [command]')
+    .usage('Usage: roco [-tT] [command...]')
     .describe('t', 'list avaliable tasks')
     .describe('T', 'list avaliable tasks with descriptions')
     .argv;
@@ -10,24 +10,14 @@ var argv = optimist
 
 var roco = require('../lib/rockout');
 
-var env, command;
-if (argv._[1]) {
-    env = argv._[0];
-    command = argv._[1];
-} else if (argv._[0]) {
-    env = 'production';
-    command = argv._[0];
-} else {
-    // ???
-}
-roco.init(env);
+roco.init('production');
 
 if (argv.T) {
     roco.list(argv.T);
 } else if (argv.t) {
     roco.list(argv.t, true);
 } else if (argv._.length) {
-    roco.perform(command);
+    roco.perform(argv._);
 } else {
     optimist.showHelp();
     console.log('Environment variables:\n');
