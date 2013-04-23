@@ -45,7 +45,7 @@ namespace 'deploy', ->
         Pull latest changes from SCM and symlink latest release
         as current release
     """
-    task 'update', (done) -> sequence 'prepare', 'updateCode', 'symlink', done
+    task 'update', (done) -> sequence 'prepare', 'updateCode', 'npm:install', 'symlink', done
 
     task 'prepare', (done) ->
         run "ls -x #{roco.releasesPath}", (res) ->
@@ -70,10 +70,18 @@ namespace 'deploy', ->
                 fi
                 """, ->
                     run """
-                        cd #{roco.sharedPath}/cached-copy;
-                        npm install -l;
                         cp -RPp #{roco.sharedPath}/cached-copy #{roco.releasePath}
                         """, done
+
+    desc """
+        Install NPM modules
+    """
+
+    task 'npm:install', (done) ->
+      run """
+          cd #{roco.releasePath};
+          npm install -l
+          """, done
 
     desc """
         Remove current symlink, symlink current release and log file
@@ -83,6 +91,7 @@ namespace 'deploy', ->
           rm -f #{roco.currentPath};
           ln -s #{roco.releasePath} #{roco.currentPath};
           ln -s #{roco.sharedPath}/log #{roco.currentPath}/log;
+          ln -s #{roco.sharedPath}/node_modules #{roco.currentPath}/node_modules;
           true
           """, done
 
@@ -115,7 +124,7 @@ namespace 'deploy', ->
         run "if [ `readlink #{roco.currentPath}` != #{roco.latestReleasePath} ]; then rm -rf #{roco.latestReleasePath}; fi", done
 
     task 'setup', (done) ->
-        dirs = [roco.deployTo, roco.releasesPath, roco.sharedPath, roco.sharedPath + '/log'].join(' ')
+        dirs = [roco.deployTo, roco.releasesPath, roco.sharedPath, roco.sharedPath + '/log', roco.sharedPath + '/node_modules'].join(' ')
         run """
             NAME=`whoami`;
             sudo mkdir -p #{dirs} &&
