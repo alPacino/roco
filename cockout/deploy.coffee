@@ -80,6 +80,7 @@ namespace 'deploy', ->
     task 'npm:install', (done) ->
       run """
           cd #{roco.releasePath};
+          ln -sf #{roco.sharedPath}/node_modules #{roco.currentPath}/node_modules;
           npm install -l
           """, done
 
@@ -91,7 +92,6 @@ namespace 'deploy', ->
           rm -f #{roco.currentPath};
           ln -s #{roco.releasePath} #{roco.currentPath};
           ln -s #{roco.sharedPath}/log #{roco.currentPath}/log;
-          ln -s #{roco.sharedPath}/node_modules #{roco.currentPath}/node_modules;
           true
           """, done
 
